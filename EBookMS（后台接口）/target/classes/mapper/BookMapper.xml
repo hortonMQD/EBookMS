@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.BookDao">
+
+    <!--使用自定义结果集类型-->
+    <resultMap id="bookList" type="com.pojo.BookInfo">
+        <id property="ID" column="ID" />
+        <result property="name" column="name"/>
+        <result property="image" column="image"/>
+        <result property="imageURL" column="imageURL"/>
+        <result property="file" column="file"/>
+        <result property="fileURL" column="fileURL"/>
+        <result property="name" column="name"/>
+        <result property="author" column="author"/>
+        <result property="text" column="text"/>
+        <result property="downloadCount" column="downloadCount"/>
+        <result property="isEnd" column="isEnd"/>
+        <result property="classID" column="classID"/>
+        <result property="uploadTime" column="uploadTime"/>
+        <result property="uploadUser" column="uploadUser"/>
+        <result property="isDelete" column="isDelete"/>
+        <result property="classNumber" column="classNumber"/>
+        <association property="opinion" javaType="com.pojo.AuditLogging">
+            <id property="ID" column="Opinion"/>
+            <result property="result" column="result"/>
+            <result property="opinion" column="opinionText"/>
+            <result property="auditor" column="auditor"/>
+        </association>
+    </resultMap>
+
+
+    <select id="SelectBookInfo" resultMap="bookList" parameterType="com.pojo.BookInfo">
+        SELECT b.ID,b.image,b.imageURL,b.file,b.fileURL,b.name,b.author,b.text,b.downloadCount,b.isEnd,
+        (SELECT NAME FROM class_info WHERE ID = b.classID) AS 'classID',b.classID AS 'classNumber',b.uploadTime,
+        (SELECT userID FROM user_info WHERE ID = b.uploadUser) AS 'uploadUser',b.isDelete,b.Opinion,
+        al.result,al.opinion AS 'opinionText',(SELECT NAME FROM employee_info WHERE ID = al.auditor) AS 'auditor' FROM book_info b,audit_log al
+        <where>
+             al.`ID` = b.`Opinion`
+            <if test="ID != null and ID != ''">
+                and b.ID = #{ID}
+            </if>
+            <if test="image != null and image != ''">
+                and b.image = #{image}
+            </if>
+            <if test="imageURL != null and imageURL != ''">
+                and b.imageURL = #{imageURL}
+            </if>
+            <if test="file != null and file != ''">
+                and b.file = #{file}
+            </if>
+            <if test="name != null and name != ''">
+                and b.name like concat('%',#{name},'%')
+            </if>
+            <if test="author != null and author != ''">
+                and b.author = #{author}
+            </if><if test="text != null and text != ''">
+              and b.text = #{text}
+            </if>
+            <if test="downloadCount != null and downloadCount != ''">
+                and b.downloadCount = #{downloadCount}
+            </if>
+            <if test="isEnd != null and isEnd != ''">
+                and b.isEnd = #{isEnd}
+            </if>
+            <if test="classID != null and classID != ''">
+                and b.classID = #{classID}
+            </if>
+            <if test="uploadTime != null and uploadTime != ''">
+                and b.uploadTime = #{uploadTime}
+            </if>
+            <if test="uploadUser != null and uploadUser != ''">
+                and b.uploadUser = #{uploadUser}
+            </if>
+            <if test="isDelete != null and isDelete != ''">
+                and b.isDelete = #{isDelete}
+            </if>
+            <if test="opinion != null">
+                <if test="opinion.result != null and opinion.result != ''">
+                    and al.result = #{opinion.result}
+                </if>
+                <if test="opinion.opinion == 'null'">
+                    and al.opinion is Null
+                </if>
+                <if test="opinion.opinion == 'not null'">
+                    and al.opinion is not Null
+                </if>
+                <if test="opinion.opinion != null and opinion.opinion != ''  and opinion.opinion != 'null' and opinion.opinion != 'not null'">
+                    and al.opinion = #{opinion.opinion}
+                </if>
+                <if test="opinion.auditor != null and opinion.auditor != ''">
+                    and al.auditor = #{opinion.auditor}
+                </if>
+            </if>
+        </where>
+         order by
+        <if test="SelectType == 2">
+            b.uploadTime desc
+        </if>
+        <if test="SelectType == 1">
+            b.downloadCount desc
+        </if>
+    </select>
+
+    <update id="UpdateBookInfo" parameterType="com.pojo.BookInfo">
+        update book_info
+        <set>
+            <if test="isDelete != null and isDelete != ''">isDelete = #{isDelete}</if>
+            <if test="downloadCount != null and downloadCount != ''">downloadCount = downloadCount+1</if>
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="InsertBookInfo" parameterType="com.pojo.BookInfo" keyProperty="ID">
+        INSERT INTO book_info (image,imageURL,FILE,fileURL,NAME,author,TEXT,downloadCount,isEnd,classID,uploadTime,uploadUser,Opinion,isDelete)
+        VALUES (#{image},#{imageURL},#{file},#{fileURL},#{name},#{author},#{text},'0',#{isEnd},#{classID},now(),#{uploadUser},#{ID},'0')
+    </insert>
+
+</mapper>

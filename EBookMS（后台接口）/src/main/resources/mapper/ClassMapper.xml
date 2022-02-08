@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.ClassDao">
+
+    <!--使用自定义结果集类型-->
+    <resultMap id="classList" type="com.pojo.ClassInfo">
+        <id property="ID" column="ID" />
+        <result property="name" column="name"/>
+        <result property="isClose" column="isClose"/>
+    </resultMap>
+
+
+    <select id="SelectClass" resultMap="classList" parameterType="com.pojo.ClassInfo">
+        SELECT ID,name FROM class_info
+        <where>
+            <if test="ID != null and ID != ''">
+                and ID = #{ID}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="isClose != null and isClose != ''">
+                and isClose = #{isClose}
+            </if>
+        </where>
+    </select>
+
+
+    <update id="UpdateClass" parameterType="com.pojo.ClassInfo">
+        update class_info
+        <set>
+            <if test="name != null and name != ''">name = #{name}</if>
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="InsertClass" parameterType="com.pojo.ClassInfo" keyProperty="ID">
+        insert into class_info (name,isClose) values(#{name},'0');
+    </insert>
+
+    <update id="DeleteClass"  parameterType="com.pojo.ClassInfo">
+        update class_info set isClose = '1' where ID = #{ID};
+    </update>
+
+
+
+</mapper>

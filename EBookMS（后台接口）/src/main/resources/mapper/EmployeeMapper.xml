@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.EmployeeDao">
+
+    <!--使用自定义结果集类型-->
+    <resultMap id="EmployeeList" type="com.pojo.EmployeeInfo">
+        <id property="ID" column="ID" />
+        <result property="employeeID" column="employeeID"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="telephone" column="telephone" />
+        <result property="password" column="password"/>
+        <result property="isOnline" column="isOnline"/>
+        <result property="loginTime" column="loginTime"/>
+        <result property="isTrue" column="isTrue"/>
+        <result property="department" column="department"/>
+    </resultMap>
+
+
+    <select id="SelectEmployee" resultMap="EmployeeList" parameterType="com.pojo.EmployeeInfo">
+        SELECT ID,employeeID,NAME,email,telephone,PASSWORD,isOnline,loginTime,isTrue,isDelete,(SELECT NAME FROM department_info WHERE ID = departID) AS 'department' FROM employee_info
+        <where>
+            <if test="ID != null and ID != ''">
+                and ID = #{ID}
+            </if>
+            <if test="employeeID != null and employeeID != ''">
+                and employeeID like concat('%',#{employeeID},'%')
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="email != null and email != ''" >
+                and email = #{email}
+            </if>
+            <if test="telephone != null and telephone != ''" >
+                and telephone = #{telephone}
+            </if>
+            <if test="password != null and password != ''" >
+                and password = #{password}
+            </if>
+            <if test="isOnline != null and isOnline != ''" >
+                and isOnline = #{isOnline}
+            </if>
+            <if test="loginTime != null and loginTime != ''" >
+                and loginTime = #{loginTime}
+            </if>
+            <if test="isTrue != null and isTrue != ''" >
+                and isTrue = #{isTrue}
+            </if>
+            <if test="isDelete != null and isDelete != ''">
+                and isDelete = #{isDelete}
+            </if>
+            <if test="department != null and department != ''">
+            and departID = #{department}
+            </if>
+        </where>
+    </select>
+
+<!--        SELECT ID,employeeID,NAME,email,telephone,PASSWORD,isOnline,loginTime,isTrue,isDelete,(SELECT NAME FROM department_info WHERE ID = departID) AS 'department' FROM employee_info
+-->
+    <update id="UpdateEmployee" parameterType="com.pojo.EmployeeInfo">
+        update employee_info
+        <set>
+            <if test="employeeID != null and employeeID != ''">employeeID = #{employeeID},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="email != null and email != ''">email = #{email},</if>
+            <if test="telephone != null and telephone != ''" >telephone = #{telephone},</if>
+            <if test="password != null and password != ''" >password = #{password}</if>
+            <if test="isOnline != null and isOnline != ''" >isOnline = #{isOnline},</if>
+            <if test="loginTime != null and loginTime != ''" >loginTime = now()</if>
+            <if test="isTrue != null and isTrue != ''">isTrue = #{isTrue}</if>
+            <if test="department != null and department != ''" >departID = #{department}</if>
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="InsertEmployee" parameterType="com.pojo.EmployeeInfo" useGeneratedKeys="true" keyProperty="ID">
+        insert into employee_info (employeeID,NAME,email,telephone,isOnline,loginTime,isTrue,isDelete,departID,password)
+        values(#{employeeID},#{name},#{email},#{telephone},'0',NOW(),'1','0',#{department},#{password})
+    </insert>
+
+    <update id="DeleteEmployee"  parameterType="com.pojo.EmployeeInfo">
+        update employee_info set isDelete = '1' where ID = #{ID};
+    </update>
+
+
+
+</mapper>

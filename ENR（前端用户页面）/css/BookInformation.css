@@ -1,0 +1,61 @@
+#content .right-box {
+	width: 77%;
+	margin-top: 20px;
+	padding-right: 10px;
+	float: right;
+}
+#content .right-box .top{
+	float: left;
+	border: 1px solid #000000;
+}
+#content .right-box .top .left{
+	float: left;
+	width: 18%;
+	overflow: hidden;
+}
+#content .right-box .top .left img{
+	width: 190px;
+	height: 230px;
+}
+#content .right-box .top .right{
+	float: right;
+	width: 80%;
+	margin-left: 10px;
+}
+#content .right-box .top .right li{
+	float: left;
+	width: 50%;
+	margin-top: 10px;
+}
+#content .right-box .middle{
+	float: left;
+	width: 100%;
+	margin-top: 20px;
+	border: 1px solid #000000;
+}
+#content .right-box .middle .text{
+	width: 100%;
+}
+#content .right-box .bottom{
+	float: left;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	width: 100%;
+	border: 1px solid #000000;
+}
+#content .right-box .bottom .downButton{
+	width: 200px;
+    height: 40px;
+    line-height: 40px;
+    background-color: #7abf36;
+    font-size: 20px;
+    text-align: center;
+    float: left;
+    margin: 20px;
+    display: block;
+}
+#content .right-box .bottom .text{
+	float: left;
+    margin: 20px;
+    display: block;
+}

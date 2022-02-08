@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>电子书资源网管理系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../css/font.css">
+    <link rel="stylesheet" href="../css/xadmin.css">
+    <script src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../js/xadmin.js"></script>
+    <script src="../js/jquery.cookie.js"></script>
+    <script src="../js/onload.js"></script>
+    <script>
+        $(function () {
+            UserList_InformationLoad();
+            var jsonString = { 'selectType': '2',"uploadUser": getQueryVariable("userID")};
+            BookListLoad(jsonString);
+        })
+    </script>
+    <script type="text/html" id="bar">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+    </script>
+    <script type="text/html" id="isEnd">
+        {{#  if(d.isEnd == '0'){ }}
+            完结
+        {{#  } else { }}
+            连载中
+        {{#  } }}
+    </script>
+    <script type="text/html" id="auditResult">
+        {{#  if(d.opinion.result == '0'){ }}
+            未通过
+        {{#  } else if(d.opinion.result == '1') { }}
+            已通过
+        {{#  } else { }}
+            未审核
+        {{#  } }}
+    </script>
+    <script type="text/html" id="NO">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!-- <div class="layui-inline"></div> -->
+<body>
+    <div class="x-body">
+        <div class="layui-form input-box">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label for="isOnline" class="layui-form-label">
+                        <span class="x-red">*</span>在线情况
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="isOnline" name="isOnline" readonly autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label for="loginTime" class="layui-form-label">
+                        <span class="x-red">*</span>登录时间
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="loginTime" name="loginTime" readonly autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label for="ID"" class=" layui-form-label">
+                        <span class="x-red">*</span>用户名
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="ID" name="ID" readonly autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label for="email" class="layui-form-label">
+                        <span class="x-red">*</span>邮箱地址
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="email" name="email" readonly autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="dataTable-box">
+            <div class="layui-form">
+                <table id="BookDataTable" lay-filter="BookDataTable" class="layui-table MainContent_rightContent_dataTable"></table>
+            </div>
+        </div>
+
+
+
+    </div>
+</body>
+
+</html>
