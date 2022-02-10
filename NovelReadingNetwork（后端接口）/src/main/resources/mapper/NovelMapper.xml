@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.NovelDao">
+    <!--使用自定义结果集类型-->
+    <resultMap id="bookList" type="com.pojo.NovelInfo">
+        <id property="ID" column="NovelID" />
+        <result property="coverUrl" column="NovelCoverUrl"/>
+        <result property="name" column="NovelName"/>
+        <result property="synopsis" column="NovelSynopsis"/>
+        <result property="state" column="NovelState"/>
+        <result property="time" column="NovelUploadTime"/>
+        <result property="isDelete" column="NovelIsDelete"/>
+        <result property="isverifyResult" column="AuditResult"/>
+        <result property="NovelRecentUpdatesTime" column="NovelRecentUpdatesTime"/>
+        <association property="author" javaType="com.pojo.UserInfo">
+            <id property="ID" column="UserID"/>
+            <result property="UName" column="UserName"/>
+            <result property="UHeadPortrait" column="UserHeadPortrait"/>
+        </association>
+        <association property="type" javaType="com.pojo.TypeInfo">
+            <id property="ID" column="NovelType"/>
+            <result property="name" column="NovelTypeName"/>
+        </association>
+        <association property="isverify" javaType="com.pojo.AuditLogInfo">
+            <id property="ID" column="auditID" />
+            <result property="result" column="auditResult"/>
+            <result property="opinion" column="auditOpinion"/>
+            <result property="time" column="auditTime"/>
+            <association property="auditor" javaType="com.pojo.AdministratorInfo">
+                <id property="ID" column="auditAuditor" />
+                <result property="AName" column="AdminName"/>
+                <result property="ANickname" column="AdminNickname"/>
+                <result property="AHeadPortrait" column="AdminHeadPortrait"/>
+            </association>
+        </association>
+        <association property="ChapterInfo" javaType="com.pojo.ChapterInfo">
+            <id property="ID" column="NovelRecentUpdatesChapter"/>
+            <result property="name" column="ChapterName"/>
+            <result property="content" column="ChapterContent"/>
+        </association>
+    </resultMap>
+
+
+    <select id="SelectUpdateNovelChapter" resultMap="bookList"  parameterType="com.pojo.NovelInfo">
+        SELECT NovelID,NovelName,NovelType,NovelTypeName,UserName,NovelRecentUpdatesChapter,NovelRecentUpdatesTime,
+        (SELECT c.content FROM chapter_info c WHERE ID = n.NovelRecentUpdatesChapter) AS 'ChapterContent',
+        (SELECT c.NAME FROM chapter_info c WHERE ID = n.NovelRecentUpdatesChapter) AS 'ChapterName' FROM novel_user_admin_audit_type n
+        <where>
+            NovelRecentUpdatesChapter IS NOT NULL
+            and n.NovelRecentUpdatesChapter IN (SELECT ChapterID FROM chapter_novel_user_admin_audit_type WHERE AuditResult = '通过')
+            <if test="ID != null and ID != ''">
+                and NovelID = #{ID}
+            </if>
+            <if test="type != null">
+                <if test="type.ID != null and type.ID != ''">
+                    and NovelType = #{type.ID}
+                </if>
+                <if test="type.name != null and type.name != ''">
+                    and NovelTypeName =  = #{type.name}
+                </if>
+            </if>
+        </where>
+        ORDER BY NovelRecentUpdatesTime DESC
+        <if test="limitCount != null and limitCount != ''">
+            LIMIT ${limitCount}
+        </if>
+    </select>
+
+
+
+
+
+    <select id="Select" resultMap="bookList" parameterType="com.pojo.NovelInfo">
+        SELECT NovelID,NovelCoverUrl,NovelName,NovelState,NovelSynopsis,NovelUploadTime,NovelIsDelete,NovelType,NovelTypeName,
+        auditID,auditType,auditResult,auditAuditor,auditOpinion,auditTime,UserID,UserName,UserHeadPortrait,AdminName,AdminNickName,AdminHeadPortrait,NovelRecentUpdatesTime
+        FROM novel_user_admin_audit_type
+        <where>
+            <if test="ID != null and ID != ''">
+                and NovelID = #{ID}
+            </if>
+            <if test="name != null and name != ''">
+                and NovelName like concat('%',#{name},'%')
+            </if>
+            <if test="synopsis != null and synopsis != ''">
+                and NovelSynopsis like concat('%',#{synopsis},'%')
+            </if>
+            <if test="state != null and state != ''">
+                and NovelState = #{state}
+            </if>
+            <if test="time != null and time != ''">
+                and NovelTime = #{time}
+            </if>
+            <if test="isDelete != null and isDelete != ''">
+                and NovelIsDelete = #{isDelete}
+            </if>
+            <if test="type != null">
+                <if test="type.ID != null and type.ID != ''">
+                    and NovelType = #{type.ID}
+                </if>
+                <if test="type.name != null and type.name != ''">
+                    and NovelTypeName =  = #{type.name}
+                </if>
+            </if>
+            <if test="author != null">
+                <if test="author.ID != null and author.ID != ''">
+                    and UserID = #{author.ID}
+                </if>
+                <if test="author.UName != null and author.UName != ''">
+                    and UserName =  like concat('%',#{author.UName},'%')
+                </if>
+            </if>
+            <if test="isverify != null">
+                <if test="isverify.type != null and isverify.type != ''">
+                    and auditType = #{isverify.type}
+                </if>
+                <if test="isverify.result != null and isverify.result != ''">
+                    and auditResult = #{isverify.result}
+                </if>
+                <if test="isverify.opinion != ''">
+                    <if test="isverify.opinion == 'null'">
+                        and auditOpinion is Null
+                    </if>
+                    <if test="isverify.opinion == 'not null'">
+                        and auditOpinion is not Null
+                    </if>
+                </if>
+                <if test="isverify.auditor != null">
+                    <if test="isverify.auditor.ID != null and isverify.auditor.ID != ''">
+                        and auditAuditor = #{isverify.auditor.ID}
+                    </if>
+                    <if test="isverify.auditor.AName != null and isverify.auditor.AName != ''">
+                        and AdminName = #{isverify.auditor.AName}
+                    </if>
+                </if>
+            </if>
+        </where>
+        <if test="NovelRecentUpdatesTime != null and NovelRecentUpdatesTime != ''">
+            ORDER BY NovelRecentUpdatesTime ASC
+        </if>
+        <if test="NovelUploadTime != null and NovelUploadTime != ''">
+            ORDER BY NovelUploadTime DESC
+        </if>
+        <if test="limitCount != null and limitCount != ''">
+            LIMIT ${limitCount}
+        </if>
+    </select>
+
+
+    <select id="ReviewsTheNovel" resultMap="bookList" parameterType="com.pojo.NovelInfo">
+        SELECT NovelID,NovelName,auditID,auditAuditor FROM novel_audit
+        <where>
+            <if test="ID != null and ID != ''">
+                and NovelID = #{ID}
+            </if>
+            <if test="name != null and name != ''">
+                and NovelName like concat('%',#{name},'%')
+            </if>
+            <if test="isverify != null">
+                <if test="isverify.ID != null and isverify.ID != ''">
+                    and auditID = #{isverify.ID}
+                </if>
+                <if test="isverify.auditor != null and opinion.auditor != ''">
+                    <if test="isverify.auditor.ID != null and isverify.auditor.ID != ''">
+                        and auditAuditor = #{isverify.auditor.ID}
+                    </if>
+                </if>
+            </if>
+        </where>
+    </select>
+
+
+
+    <update id="Update" parameterType="com.pojo.NovelInfo">
+        UPDATE novel_info
+        <set>
+            <if test="coverUrl != null and coverUrl != ''">coverUrl = #{coverUrl},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="synopsis != null and synopsis != ''">synopsis = #{synopsis},</if>
+            <if test="state != null and state != ''">state = #{state},</if>
+            <if test="isDelete != null and isDelete != ''">isDelete = #{isDelete}</if>
+            <if test="type != null"><if test="type.ID != null and type.ID != ''">type = #{type.ID}</if></if>
+            <if test="NovelRecentUpdatesTime != null and NovelRecentUpdatesTime != ''">recentUpdatesTime = now()</if>
+            <if test="NovelRecentUpdatesChapters != null and NovelRecentUpdatesChapters != ''">,recentUpdatesChapter = #{NovelRecentUpdatesChapters}</if>
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="Insert" parameterType="com.pojo.NovelInfo" keyProperty="ID">
+        INSERT INTO novel_info (ID,coverUrl,NAME,synopsis,state,Author,isverify,TIME,isDelete,TYPE)
+        VALUES (#{ID},#{coverUrl},#{name},#{synopsis},'连载中',#{AuthorID},#{isverify.ID},now(),'0',#{TypeID})
+    </insert>
+
+</mapper>

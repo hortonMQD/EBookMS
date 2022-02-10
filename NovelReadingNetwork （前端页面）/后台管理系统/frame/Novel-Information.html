@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>终点小说网管理系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../css/font.css">
+    <link rel="stylesheet" href="../css/xadmin.css">
+    <link rel="stylesheet" href="../css/myselfStyle.css">
+    <script src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../js/xadmin.js"></script>
+    <script src="../js/jquery.cookie.js"></script>
+    <script src="../js/jquery-form.js"></script>
+    <script src="../js/onload.js"></script>
+    <script src="../js/submit.js"></script>
+    <script>
+        $(function () {
+            if (getQueryVariable("Type") == 1) {
+                $('div[class="layui-card"]').remove();
+            } else {
+                $('div[class="AuditInformation_ul"]').remove();
+            }
+            loadNovelInformation();
+        })
+    </script>
+    <script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="Audit">审核信息</a>
+</script>
+
+    <script type="text/html" id="isverifyTime">
+    {{#  if(d.isverifyResult == '未审核'){ }}
+    {{#  } else { }}
+        
+    {{#  } }}
+</script>
+
+
+</head>
+
+<body>
+    <div class="x-body">
+
+        <div id="Content-Box">
+            <div id="Content-Box_Top">
+                <div class="left">
+                    <img class="Content-Box_Top_coverImage" src="../images/光之魔法阵.png" />
+                </div>
+                <div class="right">
+                    <h1 class="NovelNameTitle">小说名称</h1>
+                    <ul class="dataList">
+                        <li>作者：</li>
+                        <li>小说类型：</li>
+                        <li>发布时间：</li>
+                        <li>连载状态：</li>
+                    </ul>
+
+                </div>
+
+                <div class="EmptyBox"></div>
+            </div>
+
+
+            <div id="Content-Box_Middle">
+                <div class="title-box">
+                    <h1>小说详情</h1>
+                </div>
+                <div class="text middle_Text">
+                    <p class="NovleSynopsis">
+                        穿越名侦探柯南的世界，池非迟被送进了医院。周二。医生：“明天周几？”池非迟：“周三。”医生：“咳，明天周五。”池非迟：“……”月日。医生：“明天几月几日？”池非迟：“月日。”医生：“咳，明天月日。”池非迟：“……”当所有人都认为混乱的时间是正确的，而其中一人无法正确辩识并融入其中，那这个人就是异类，就是病人！一入病院深似海，此生痊愈不可能。池非迟深吸一口气：“老！子！不！干！了！”
+                    </p>
+                </div>
+            </div>
+
+
+            <div id="Content-Box_Bottom">
+                <div class="AuditTableBox">
+
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            <h1>审核信息</h1>
+                        </div>
+                        <div class="layui-card-body" style="padding: 15px;">
+                            <div class="layui-form" action="" lay-filter="component-form-group">
+
+
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">审核结果</label>
+                                    <div class="layui-input-block">
+                                        <select name="AuditResult">
+                                            <option value=""></option>
+                                            <option value="通过">通过</option>
+                                            <option value="不通过">不通过</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item layui-form-text">
+                                    <label class="layui-form-label">审核意见</label>
+                                    <div class="layui-input-block">
+                                        <textarea name="AuditOpinion" placeholder="请输入内容"
+                                            class="layui-textarea"></textarea>
+                                    </div>
+                                </div>
+
+
+                                <div class="layui-form-item layui-form-text">
+                                    <input type="hidden" name="AuditID" value="">
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <div class="layui-footer" style="left: 0;">
+                                            <button class="layui-btn" onclick="NovelAuditSubmit()">立即提交</button>
+                                            <button class="layui-btn layui-btn-primary">重置</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+
+
+
+
+                        </div>
+                    </div>
+
+
+                    <div class="AuditInformation_ul">
+                        <h1>审核信息</h1>
+
+
+                        <ul class="AuditDataList">
+                            <li>审核者：</li>
+                            <li>审核时间：2022-01-27 20：49：53</li>
+                            <li>审核结果：不通过</li>
+                        </ul>
+
+
+
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label" style="font-size: 20px;">审核意见</label>
+                            <div class="layui-input-block">
+                                <textarea name="AuditOpinion" readonly class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+            <script type="text/html" id="rank">
+                {{d.LAY_TABLE_INDEX+1}}
+            </script>
+
+
+            <div id="Content-Box_Bottom_Bottom">
+                <div class="dataTable-box">
+                    <div class="layui-form">
+                        <table id="ChapterDataTable" lay-filter="ChapterDataTable"
+                            class="layui-table MainContent_rightContent_dataTable">
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+    </div>
+</body>
+
+</html>

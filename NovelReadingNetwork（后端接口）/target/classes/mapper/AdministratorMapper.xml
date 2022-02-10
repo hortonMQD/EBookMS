@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.AdministratorDao">
+    <!--使用自定义结果集类型-->
+    <resultMap id="AdministratorList" type="com.pojo.AdministratorInfo">
+        <id property="ID" column="ID" />
+        <result property="AName" column="AName"/>
+        <result property="ANickname" column="ANickname"/>
+        <result property="AEmail" column="AEmail" />
+        <result property="ATelephone" column="ATelephone"/>
+        <result property="APassword" column="APassword"/>
+        <result property="AHeadPortrait" column="AHeadPortrait"/>
+        <association property="ARole" javaType="com.pojo.PersonalRoleInfo">
+            <id property="ID" column="RoleID" />
+            <result property="chapter" column="chapterRole"/>
+            <result property="novel" column="novelRole"/>
+            <result property="role" column="roleRole"/>
+            <result property="type" column="typeRole" />
+            <result property="administrator" column="administratorRole"/>
+            <result property="user" column="userRole"/>
+            <result property="name" column="nameRole"/>
+        </association>
+    </resultMap>
+
+
+    <select id="Select" resultMap="AdministratorList" parameterType="com.pojo.AdministratorInfo">
+        SELECT a.`ID`,a.`AName`,a.`ANickname`,a.`AEmail`,a.`ATelephone`,a.`APassword`,a.`AHeadPortrait`,p.`ID` AS 'RoleID',p.`administrator` AS 'administratorRole',
+        p.`chapter` AS 'chapterRole',p.`name` AS 'nameRole',p.`novel` AS 'novelRole',p.`role` AS 'roleRole',p.`type` AS 'typeRole',p.`user` AS 'userRole'
+        FROM administrator_info a,permission_role_info p
+        <where>
+            p.`ID` = a.`ARole`
+            <if test="ID != null and ID != ''">
+                and a.ID = #{ID}
+            </if>
+            <if test="AName != null and AName != ''">
+                and a.AName like concat('%',#{AName},'%')
+            </if>
+            <if test="ANickname != null and ANickname != ''">
+                and a.ANickname like concat('%',#{ANickname},'%')
+            </if>
+            <if test="AEmail != null and AEmail != ''">
+                and a.AEmail = #{AEmail}
+            </if>
+            <if test="ATelephone != null and ATelephone != ''" >
+                and a.ATelephone = #{ATelephone}
+            </if>
+            <if test="APassword != null and APassword != ''" >
+                and a.APassword = #{APassword}
+            </if>
+            <if test="AHeadPortrait != null and AHeadPortrait != ''">
+                and a.AHeadPortrait = #{AHeadPortrait}
+            </if>
+            <if test="ARole != null">
+                <if test="ARole.ID != null and ARole.ID != ''">
+                    and a.ARole = #{ARole.ID}
+                </if>
+            </if>
+        </where>
+    </select>
+
+
+    <update id="Update" parameterType="com.pojo.AdministratorInfo">
+        UPDATE administrator_info
+        <set>
+            <if test="AName != null and AName != ''">AName = #{AName},</if>
+            <if test="ANickname != null and ANickname != ''">ANickname = #{ANickname},</if>
+            <if test="AEmail != null and AEmail != ''" >AEmail = #{AEmail},</if>
+            <if test="ATelephone != null and ATelephone != ''" >ATelephone = #{ATelephone},</if>
+            <if test="APassword != null and APassword != ''">APassword = #{APassword}</if>
+            <if test="AHeadPortrait != null and AHeadPortrait != ''">AHeadPortrait = #{AHeadPortrait},</if>
+            <if test="ARole != null"><if test="ARole.ID != null and ARole.ID != ''">ARole = #{ARole.ID}</if></if>
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="Insert" parameterType="com.pojo.AdministratorInfo" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO administrator_info (ID,AName,AEmail,ATelephone,APassword,ARole,AHeadPortrait)
+        VALUES (#{ID},#{AName},#{AEmail},#{ATelephone},'123456',#{ARole.ID},'http://localhost:8888/NRN/image/HeadPortrait/moren_HeadPortrait.jpeg')
+    </insert>
+
+    <delete id="Delete"  parameterType="com.pojo.AdministratorInfo">
+        delete from administrator_info where ID = #{ID};
+    </delete>
+
+
+
+</mapper>

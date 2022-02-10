@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.TypeDao">
+    <!--使用自定义结果集类型-->
+    <resultMap id="TypeList" type="com.pojo.TypeInfo">
+        <id property="ID" column="ID" />
+        <result property="name" column="name"/>
+        <result property="time" column="time"/>
+    </resultMap>
+
+
+    <select id="Select" resultMap="TypeList" parameterType="com.pojo.TypeInfo">
+        SELECT ID,name,time FROM type_info
+        <where>
+            <if test="ID != null and ID != ''">
+                and ID = #{ID}
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="time != null and time != ''">
+                and time = #{time}
+            </if>
+        </where>
+    </select>
+
+
+    <update id="Update" parameterType="com.pojo.TypeInfo">
+        UPDATE type_info
+        <set>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="time != null and time != ''">time = #{time}</if>
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="Insert" parameterType="com.pojo.TypeInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into type_info (ID,name,time) values(#{ID},#{name},now());
+    </insert>
+
+    <delete id="Delete"  parameterType="com.pojo.TypeInfo">
+        delete from type_info where ID = #{ID};
+    </delete>
+
+
+
+</mapper>

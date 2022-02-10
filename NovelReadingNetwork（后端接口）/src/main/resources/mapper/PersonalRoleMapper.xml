@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+        <!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.PersonalRoleDao">
+    <!--使用自定义结果集类型-->
+    <resultMap id="PersonalRoleList" type="com.pojo.PersonalRoleInfo">
+        <id property="ID" column="ID" />
+        <result property="chapter" column="chapter"/>
+        <result property="novel" column="novel"/>
+        <result property="role" column="role"/>
+        <result property="type" column="type" />
+        <result property="administrator" column="administrator"/>
+        <result property="user" column="user"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+
+    <select id="Select" resultMap="PersonalRoleList" parameterType="com.pojo.PersonalRoleInfo">
+        SELECT ID,chapter,novel,role,TYPE,administrator,USER,NAME FROM permission_role_info
+        <where>
+            <if test="ID != null and ID != ''">
+                and ID = #{ID}
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+
+    <update id="Update" parameterType="com.pojo.PersonalRoleInfo">
+        UPDATE permission_role_info
+        <set>
+            <if test="chapter != null and chapter != ''">chapter = #{chapter},</if>
+            <if test="novel != null and novel != ''">novel = #{novel}</if>
+            <if test="role != null and role != ''" >role = #{role}</if>
+            <if test="type != null and type != ''" >type = #{type}</if>
+            <if test="administrator != null and administrator != ''">administrator = #{administrator}</if>
+            <if test="user != null and user != ''" >user = #{user}</if>
+            <if test="name != null and name != ''" >name = #{name}</if>
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="Insert" parameterType="com.pojo.PersonalRoleInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into permission_role_info (ID,chapter,novel,role,TYPE,administrator,USER,NAME) values(#{ID},#{chapter},#{novel},#{role},#{type},#{administrator},#{user},#{name});
+    </insert>
+
+    <delete id="Delete"  parameterType="com.pojo.UserInfo">
+        delete from permission_role_info where ID = #{ID};
+    </delete>
+
+
+
+</mapper>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.EmployeeDao">
+
+    <!--使用自定义结果集类型-->
+    <resultMap id="EmployeeList" type="com.pojo.Employee">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone" />
+        <result property="password" column="password"/>
+        <result property="sex" column="sex"/>
+        <result property="education" column="education"/>
+        <result property="address" column="address"/>
+        <result property="create_date" column="create_date"/>
+        <result property="card_id" column="card_id"/>
+        <association property="dept" javaType="com.pojo.Dept">
+            <id property="id" column="dept_id"/>
+            <result property="name" column="deptName"/>
+            <result property="remark" column="deptRemark"/>
+        </association>
+        <association property="job" javaType="com.pojo.Job">
+            <id property="id" column="job_id"/>
+            <result property="name" column="jobName"/>
+            <result property="remark" column="jobRemark"/>
+        </association>
+    </resultMap>
+
+
+
+
+    <select id="SelectEmployee" resultMap="EmployeeList" parameterType="com.pojo.Employee">
+        select e.id,e.name,e.card_id,e.address,e.phone,e.email,e.sex,e.education,e.create_date,e.password,e.dept_id,e.job_id,
+        d.name as 'deptName',d.remark as 'deptRemark',j.name as 'jobName',j.remark as 'jobRemark' from job_inf j,dept_inf d,employee_inf e
+        <where>
+            j.`id` = e.`job_id` AND d.`id` = e.`dept_id`
+            <if test="id != null and id != ''">
+                and e.id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and e.name = #{name}
+            </if>
+            <if test="isEnd != null and isEnd != ''">
+                and e.isEnd = #{isEnd}
+            </if>
+            <if test="card_id != null and card_id != ''">
+                and e.card_id = #{card_id}
+            </if>
+            <if test="address != null and address != ''">
+                and e.address = #{address}
+            </if>
+            <if test="phone != null and phone != ''">
+                and e.phone = #{phone}
+            </if>
+            <if test="sex != null and sex != ''">
+                and e.sex = #{sex}
+            </if>
+            <if test="education != null and education != ''">
+                and e.education = #{education}
+            </if>
+            <if test="create_date != null and create_date != ''">
+                and e.create_date = #{create_date}
+            </if>
+            <if test="password != null and password != ''">
+                and e.password = #{password}
+            </if>
+            <if test="dept != null">
+                <if test="dept.id != null and dept.id != ''">
+                    and e.dept_id = #{dept.id}
+                </if>
+                <if test="dept.name != null and dept.name != ''">
+                    and d.name = #{dept.name}
+                </if>
+                <if test="dept.remark != null and dept.remark != ''">
+                    and d.remark = #{dept.remark}
+                </if>
+            </if>
+            <if test="job != null">
+                <if test="job.id != null and job.id != ''">
+                    and e.job_id = #{job.id}
+                </if>
+                <if test="job.name != null and job.name != ''">
+                    and j.name = #{job.name}
+                </if>
+                <if test="job.remark != null and job.remark != ''">
+                    and j.remark = #{job.remark}
+                </if>
+            </if>
+        </where>
+    </select>
+
+
+
+
+
+    <update id="UpdateEmployee" parameterType="com.pojo.Employee">
+        update employee_inf
+        <set>
+            <if test="dept != null">dept_id = #{dept.id},</if>
+            <if test="job != null" >job_id = #{job.id},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="card_id != null and card_id != ''" >card_id = #{card_id},</if>
+            <if test="address != null and address != ''" >address = #{address},</if>
+            <if test="phone != null and phone != ''" >phone = #{phone},</if>
+            <if test="email != null and email != ''">email = #{email},</if>
+            <if test="sex != null and sex != ''">sex = #{sex},</if>
+            <if test="education != null and education != ''">education = #{education},</if>
+            <if test="password != null and password != ''" >password = #{password}</if>
+        </set>
+        where id = #{id};
+    </update>
+
+
+    <insert id="InsertEmployee" parameterType="com.pojo.Employee" useGeneratedKeys="true" keyProperty="id">
+        insert into employee_inf (dept_id,job_id,NAME,card_id,address,phone,email,sex,education,password,create_date)
+        values(#{dept.id},#{job.id},#{name},#{card_id},#{address},#{phone},#{email},#{sex},#{education},#{password},now())
+    </insert>
+
+    <delete id="DeleteEmployee"  parameterType="com.pojo.Employee">
+        delete from employee_inf where id = #{id};
+    </delete>
+
+
+
+</mapper>
