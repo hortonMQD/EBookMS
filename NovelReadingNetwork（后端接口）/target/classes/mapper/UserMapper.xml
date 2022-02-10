@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.UserDao">
+    <!--使用自定义结果集类型-->
+    <resultMap id="UserList" type="com.pojo.UserInfo">
+        <id property="ID" column="ID" />
+        <result property="UName" column="UName"/>
+        <result property="UEmail" column="UEmail"/>
+        <result property="UPassword" column="UPassword"/>
+        <result property="UHeadPortrait" column="UHeadPortrait"/>
+    </resultMap>
+
+
+    <select id="Select" resultMap="UserList" parameterType="com.pojo.UserInfo">
+        SELECT ID,UName,UPassword,UEmail,UHeadPortrait FROM user_info
+        <where>
+            <if test="ID != null and ID != ''">
+                and ID = #{ID}
+            </if>
+            <if test="UName != null and UName != ''">
+                and UName like concat('%',#{UName},'%')
+            </if>
+            <if test="UEmail != null and UEmail != ''">
+                and UEmail = #{UEmail}
+            </if>
+            <if test="UPassword != null and UPassword != ''" >
+                and UPassword = #{UPassword}
+            </if>
+            <if test="UHeadPortrait != null and UHeadPortrait != ''" >
+                and UHeadPortrait = #{UHeadPortrait}
+            </if>
+        </where>
+    </select>
+
+
+    <update id="Update" parameterType="com.pojo.UserInfo">
+        UPDATE user_info
+        <set>
+            <if test="UName != null and UName != ''">UName = #{UName},</if>
+            <if test="UEmail != null and UEmail != ''">UEmail = #{UEmail},</if>
+            <if test="UPassword != null and UPassword != ''" >UPassword = #{UPassword}</if>
+            <if test="UHeadPortrait != null and UHeadPortrait != ''" >UHeadPortrait = #{UHeadPortrait}</if>
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="Insert" parameterType="com.pojo.UserInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into user_info (ID,UName,UEmail,UPassword,UHeadPortrait) values(#{ID},#{UName},#{UEmail},'123456','http://localhost:8888/NRN/image/HeadPortrait/moren_HeadPortrait.jpeg');
+    </insert>
+
+    <delete id="Delete"  parameterType="com.pojo.UserInfo">
+        delete from user_info where ID = #{ID};
+    </delete>
+
+
+
+</mapper>

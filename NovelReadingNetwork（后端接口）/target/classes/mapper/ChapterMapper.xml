@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.ChapterDao">
+    <!--使用自定义结果集类型-->
+    <resultMap id="ChapterList" type="com.pojo.ChapterInfo">
+        <id property="ID" column="ChapterID" />
+        <result property="name" column="ChapterName"/>
+        <result property="content" column="ChapterContent"/>
+        <result property="time" column="ChapterTime"/>
+        <result property="isDelete" column="ChapterIsDelete"/>
+        <result property="isverifyResult" column="AuditResult"/>
+        <association property="isverify" javaType="com.pojo.AuditLogInfo">
+            <id property="ID" column="AuditID" />
+            <result property="result" column="AuditResult"/>
+            <result property="time" column="AuditTime"/>
+            <result property="opinion" column="AuditOpinion"/>
+            <association property="auditor" javaType="com.pojo.AdministratorInfo">
+                <id property="ID" column="AdminID" />
+                <result property="AName" column="AdminName"/>
+                <result property="ANickname" column="AdminNickname"/>
+                <result property="AHeadPortrait" column="AdminHeadPortrait"/>
+            </association>
+        </association>
+        <association property="Novel" javaType="com.pojo.NovelInfo">
+            <id property="ID" column="NovelID"/>
+            <result property="name" column="NovelName"/>
+            <result property="coverUrl" column="NovelCoverUrl"/>
+            <result property="state" column="NovelState"/>
+            <association property="author" javaType="com.pojo.UserInfo">
+                <id property="ID" column="UserID"/>
+                <result property="UName" column="UserName"/>
+                <result property="UHeadPortrait" column="UserHeadPortrait"/>
+            </association>
+            <association property="type" javaType="com.pojo.TypeInfo">
+                <id property="ID" column="TypeID"/>
+                <result property="name" column="TypeName"/>
+            </association>
+        </association>
+    </resultMap>
+
+
+
+
+    <select id="SelectChapterList" resultMap="ChapterList" parameterType="com.pojo.ChapterInfo">
+        SELECT ChapterID,ChapterName,ChapterTime,ChapterIsDelete,AuditResult,AuditOpinion,AdminName,AdminNickname,AdminHeadPortrait,AdminID,
+        NovelID,NovelName,UserName,UserHeadPortrait,UserID,TypeID,TypeName,AuditID,AuditTime
+        FROM chapter_novel_user_admin_audit_type
+        <where>
+            <if test="isDelete != null and isDelete != ''">
+                and ChapterIsDelete = #{isDelete}
+            </if>
+            <if test="isverify != null">
+                <if test="isverify.result != null and isverify.result != ''">
+                    and AuditResult = #{isverify.result}
+                </if>
+                <if test="isverify.opinion == 'null'">
+                    and AuditOpinion is Null
+                </if>
+                <if test="isverify.opinion == 'not null'">
+                    and AuditOpinion is not Null
+                </if>
+            </if>
+            <if test="Novel != null">
+                <if test="Novel.ID != null and Novel.ID != ''">
+                    and NovelID = #{Novel.ID}
+                </if>
+                <if test="Novel.name != null and Novel.name != ''">
+                    and NovelName = #{Novel.name}
+                </if>
+                <if test="Novel.author != null">
+                    <if test="Novel.author.ID != null and Novel.author.ID != ''">
+                        and UserID = #{Novel.author.ID}
+                    </if>
+                    <if test="Novel.author.userID != null and Novel.author.userID != ''">
+                        and UserName =  like concat('%',#{Novel.author.UName},'%')
+                    </if>
+                </if>
+            </if>
+        </where>
+        <if test="ChapterTimeASC_DESC != null and ChapterTimeASC_DESC != ''">
+            <if test="ChapterTimeASC_DESC == 1">
+                ORDER BY ChapterTime ASC
+            </if>
+            <if test="ChapterTimeASC_DESC == 2">
+                ORDER BY ChapterTime DESC
+            </if>
+        </if>
+        <if test="limitCount != null and limitCount != ''">
+            LIMIT ${limitCount}
+        </if>
+    </select>
+
+
+
+
+
+    <select id="Select" resultMap="ChapterList" parameterType="com.pojo.ChapterInfo">
+        SELECT ChapterID,ChapterName,ChapterContent,ChapterTime,ChapterIsDelete,AuditResult,AuditOpinion,AdminName,AdminNickname,AdminHeadPortrait,AdminID,
+        NovelID,NovelName,NovelState,NovelCoverUrl,UserName,UserHeadPortrait,UserID,TypeID,TypeName,AuditID,AuditTime
+        FROM chapter_novel_user_admin_audit_type
+        <where>
+            <if test="ID != null and ID != ''">
+                and ChapterID = #{ID}
+            </if>
+            <if test="name != null and name != ''">
+                and ChapterName like concat('%',#{name},'%')
+            </if>
+            <if test="content != null and content != ''">
+                and ChapterContent like concat('%',#{content},'%')
+            </if>
+            <if test="isDelete != null and isDelete != ''">
+                and ChapterIsDelete = #{isDelete}
+            </if>
+            <if test="time != null and time != ''">
+                and ChapterTime like concat('%',#{time},'%')
+            </if>
+            <if test="AuthorID != null and AuthorID != ''">
+                and UserID = #{AuthorID}
+            </if>
+            <if test="isverify != null">
+                <if test="isverify.result != null and isverify.result != ''">
+                    and AuditResult = #{isverify.result}
+                </if>
+                <if test="isverify.opinion == 'null'">
+                    and AuditOpinion is Null
+                </if>
+                <if test="isverify.opinion == 'not null'">
+                    and AuditOpinion is not Null
+                </if>
+                <if test="isverify.auditor != null">
+                    <if test="isverify.auditor.ID != null and isverify.auditor.ID != ''">
+                        and NovelID IN (SELECT n.`NovelID` FROM novel_user_admin_audit_type n WHERE n.`auditAuditor` = #{isverify.auditor.ID})
+                    </if>
+                    <if test="isverify.auditor.AName != null and isverify.auditor.AName != ''">
+                        and AdminName = #{isverify.auditor.AName}
+                    </if>
+                </if>
+            </if>
+            <if test="Novel != null">
+                <if test="Novel.ID != null and Novel.ID != ''">
+                    and NovelID = #{Novel.ID}
+                </if>
+                <if test="Novel.name != null and Novel.name != ''">
+                    and NovelName = #{Novel.name}
+                </if>
+                <if test="Novel.state != null and Novel.state != ''">
+                    and NovelState = #{Novel.state}
+                </if>
+                <if test="Novel.author != null">
+                  <if test="Novel.author.ID != null and Novel.author.ID != ''">
+                    and UserID = #{Novel.author.ID}
+                  </if>
+                  <if test="Novel.author.userID != null and Novel.author.userID != ''">
+                    and UserName =  like concat('%',#{Novel.author.UName},'%')
+                  </if>
+                </if>
+                <if test="Novel.type != null">
+                    <if test="Novel.type.ID != null and Novel.type.ID != ''">
+                        and TypeID = #{Novel.type.ID}
+                    </if>
+                    <if test="Novel.type.name != null and Novel.type.name != ''">
+                        and TypeName =  = #{Novel.type.name}
+                    </if>
+                </if>
+
+            </if>
+        </where>
+        ORDER BY ChapterTime ASC
+    </select>
+
+    <update id="Update" parameterType="com.pojo.ChapterInfo">
+        update chapter_info
+        <set>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="content != null and content != ''">content = #{content}</if>
+            <if test="isDelete != null and isDelete != ''">isDelete = #{isDelete}</if>
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="Insert" parameterType="com.pojo.ChapterInfo" keyProperty="ID">
+         INSERT INTO chapter_info (ID,NAME,content,isverify,isDelete,TIME,NID)
+         VALUES (#{ID},#{name},#{content},#{isverify.ID},'0',now(),#{Novel.ID})
+    </insert>
+
+</mapper>

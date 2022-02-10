@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.NoticeDao">
+
+    <!--使用自定义结果集类型-->
+    <resultMap id="NoticeList" type="com.pojo.Notice">
+        <id property="id" column="id" />
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="Create_date" column="createDate" />
+        <association property="user" javaType="com.pojo.Job">
+            <id property="id" column="userID"/>
+            <result property="username" column="username"/>
+        </association>
+    </resultMap>
+
+
+
+
+    <select id="SelectNotice" resultMap="NoticeList" parameterType="com.pojo.Notice">
+        select n.id,n.title,n.content,n.userID,n.createDate,u.username from notice_inf n,user_inf u
+        <where>
+            u.`id` = n.`userID`
+            <if test="id != null and id != ''">
+                and n.id = #{id}
+            </if>
+            <if test="title != null and title != ''">
+                and n.title = #{title}
+            </if>
+            <if test="content != null and content != ''">
+                and n.content = #{content}
+            </if>
+            <if test="Create_date != null and Create_date != ''">
+                and n.createDate = #{Create_date}
+            </if>
+            <if test="user != null">
+                <if test="user.id != null and user.id != ''">
+                    and u.userID = #{user.id}
+                </if>
+                <if test="user.name != null and user.name != ''">
+                    and u.username = #{user.name}
+                </if>
+            </if>
+        </where>
+    </select>
+
+
+
+
+
+    <update id="UpdateNotice" parameterType="com.pojo.Notice">
+        update notice_inf
+        <set>
+            <if test="user != null">userID = #{user.id},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="Create_date != null and Create_date != ''" >createDate = #{Create_date},</if>
+            <if test="content != null and content != ''" >content = #{content}</if>
+        </set>
+        where id = #{id};
+    </update>
+
+
+    <insert id="InsertNotice" parameterType="com.pojo.Notice" useGeneratedKeys="true" keyProperty="id">
+        insert into notice_inf (userID,title,content,createDate)
+        values(#{user.id},#{title},#{content},now())
+    </insert>
+
+    <delete id="DeleteNotice"  parameterType="com.pojo.Notice">
+        delete from notice_inf where id = #{id};
+    </delete>
+
+
+
+</mapper>

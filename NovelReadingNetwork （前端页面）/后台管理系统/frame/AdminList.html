@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>终点小说网管理系统</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/xadmin.css">
+  <script src="../js/jquery.min.js"></script>
+  <script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="../js/xadmin.js"></script>
+  <script src="../js/onload.js"></script>
+  <link rel="stylesheet" href="../css/myselfStyle.css">
+
+  <script>
+    $(function () {
+      loadAdminListDateTable();
+    })
+  </script>
+
+
+<script type="text/html" id="headPortrait">
+  <img src="{{d.aheadPortrait}}" style="width: 150px;height:150px;"/>
+</script>
+<script type="text/html" id="rank">
+  {{d.LAY_TABLE_INDEX+1}}
+  </script>
+  <script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">详细信息</a>
+</script>
+
+<body>
+  <div class="x-body">
+    <div class="layui-row">
+      <div class="layui-form layui-col-md12 x-so">
+        <input type="text" name="username" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+        <button class="layui-btn" onclick=""><i class="layui-icon">&#xe615;</i></button>
+      </div>
+    </div>
+    <xblock>
+      <button class="layui-btn" onclick="x_admin_show('添加管理员','adminInsert.html',600,450)"><i
+          class="layui-icon"></i>添加</button>
+      <span class="x-right" style="line-height:40px"><label id="dateCount">共有数据：88 条</label></span>
+    </xblock>
+
+    <div class="dataTable-box">
+      <div class="layui-form">
+        <table id="AdminDataTable" lay-filter="AdminDataTable" class="layui-table MainContent_rightContent_dataTable">
+        </table>
+      </div>
+    </div>
+
+  </div>
+</body>
+
+</html>

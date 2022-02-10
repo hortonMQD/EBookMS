@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.AuditLogDao">
+    <!--使用自定义结果集类型-->
+    <resultMap id="auditLoggingList" type="com.pojo.AuditLogInfo">
+        <id property="ID" column="ID" />
+        <result property="type" column="type"/>
+        <result property="result" column="result"/>
+        <result property="opinion" column="opinion"/>
+        <result property="time" column="time"/>
+        <association property="auditor" javaType="com.pojo.AdministratorInfo">
+            <id property="ID" column="auditorID" />
+            <result property="AName" column="auditorName"/>
+            <result property="ANickname" column="auditorNickname"/>
+        </association>
+    </resultMap>
+
+
+    <select id="Select" resultMap="auditLoggingList" parameterType="com.pojo.AuditLogInfo">
+        SELECT al.ID,al.`type`,al.result,al.opinion,al.auditor,al.`time`,(SELECT AName FROM administrator_info WHERE ID = al.`auditor`) AS 'auditorName',
+        (SELECT ANickname FROM administrator_info WHERE ID = al.`auditor`) AS 'auditorNickname' FROM audit_log al
+        <where>
+            al.`auditor` = a.`ID`
+            <if test="ID != null and ID != ''">
+                and al.ID = #{ID}
+            </if>
+            <if test="type != null and type != ''">
+                and al.type = #{type}
+            </if>
+            <if test="result != null and result != ''">
+                and al.result = #{result}
+            </if>
+            <if test="opinion != null and opinion != ''">
+                and al.opinion = #{opinion}
+            </if>
+            <if test="auditor != null">
+                <if test="auditor.ID != null and auditor.ID != ''">
+                    and al.auditor = #{auditor.ID}
+                </if>
+            </if>
+        </where>
+    </select>
+
+
+    <update id="Update" parameterType="com.pojo.AuditLogInfo">
+        update audit_log
+        <set>
+            <if test="result != null and result != ''">result = #{result},</if>
+            <if test="opinion != null and opinion != ''">opinion = #{opinion},</if>
+            <if test="auditor != null">auditor = #{auditor.ID},</if>
+            time = now()
+        </set>
+        where ID = #{ID};
+    </update>
+
+
+    <insert id="Insert" parameterType="com.pojo.AuditLogInfo" useGeneratedKeys="true" keyProperty="ID">
+        INSERT INTO audit_log (ID,type,result) VALUES (#{ID},#{type},'未审核')
+    </insert>
+
+
+
+
+
+    <delete id="Delete"  parameterType="com.pojo.AuditLogInfo">
+        delete from audit_log where ID = #{ID}
+    </delete>
+
+
+
+</mapper>

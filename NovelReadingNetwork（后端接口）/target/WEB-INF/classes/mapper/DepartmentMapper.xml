@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace的值设置为DAO类对应的路径 -->
+<mapper namespace="com.dao.DepartmentDao">
+
+    <!--使用自定义结果集类型-->
+    <resultMap id="departmentList" type="com.pojo.Dept">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+
+    <select id="SelectDepartment" resultMap="departmentList" parameterType="com.pojo.Dept">
+        SELECT id,name,remark FROM dept_inf
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+        </where>
+    </select>
+
+
+    <update id="UpdateDepartment" parameterType="com.pojo.Dept">
+        update dept_inf
+        <set>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="remark != null and remark != ''">remark = #{remark}</if>
+        </set>
+        where id = #{id};
+    </update>
+
+
+    <insert id="InsertDepartment" parameterType="com.pojo.Dept" keyProperty="id">
+        insert into dept_inf (name,remark) values(#{name},#{remark});
+    </insert>
+
+    <delete id="DeleteDepartment"  parameterType="com.pojo.Dept">
+        delete from dept_inf where id = #{ID};
+    </delete>
+
+
+
+</mapper>
